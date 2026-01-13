@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "PCModel"
+name = "pcm"
 version = "0.0.1"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -12,6 +12,10 @@ dependencies = [
     "jax",
     "equinox",
     "optax",
+    "numpy",
+    "torch",
+    "torchvision",
+    "matplotlib",
 ]
 
 [tool.setuptools.packages.find]

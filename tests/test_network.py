@@ -3,7 +3,7 @@ import unittest
 import equinox as eqx
 import jax.numpy as jnp
 import jax.random as jr
-from PCModel.network import Edge, Vertex, Network
+from pcm.network import Edge, Vertex, ChainNetwork
 
 class SimpleLinear(eqx.Module):
     weight: jnp.ndarray
@@ -60,7 +60,7 @@ class NetworkTest(unittest.TestCase):
         self.edge2 = Edge(self.hidden_v, self.output_v, self.layer2)
         
         # Create network
-        self.network = Network(edges=[self.edge1, self.edge2])
+        self.network = ChainNetwork(edges=[self.edge1, self.edge2])
     
     def test_network_initialization(self):
         """Test that network properly initializes vertices."""
@@ -207,6 +207,50 @@ class NetworkTest(unittest.TestCase):
         )
         
         self.assertEqual(len(energy_history), 2)
+    
+    def test_forward(self):
+        """Test forward propagation through the chain."""
+        batch_size = 4
+        key = jr.PRNGKey(111)
+        
+        # Create input data
+        input_data = {
+            "input": jr.normal(key, (batch_size, 2)),
+        }
+        
+        # Forward pass
+        output_states = self.network.forward(input_states=input_data)
+        
+        # Check that all vertices are computed
+        self.assertIn("input", output_states)
+        self.assertIn("hidden", output_states)
+        self.assertIn("output", output_states)
+        
+        # Check shapes
+        self.assertEqual(output_states["input"].shape, (batch_size, 2))
+        self.assertEqual(output_states["hidden"].shape, (batch_size, 3))
+        self.assertEqual(output_states["output"].shape, (batch_size, 2))
+    
+    def test_forward_with_returned_vertices(self):
+        """Test forward with specific returned vertices."""
+        batch_size = 4
+        key = jr.PRNGKey(222)
+        
+        input_data = {
+            "input": jr.normal(key, (batch_size, 2)),
+        }
+        
+        # Forward pass with only hidden returned
+        output_states = self.network.forward(
+            input_states=input_data,
+            returned_vertices=["hidden", "output"]
+        )
+        
+        # Check that only requested vertices are returned
+        self.assertEqual(len(output_states), 2)
+        self.assertIn("hidden", output_states)
+        self.assertIn("output", output_states)
+        self.assertNotIn("input", output_states)
 
 
 if __name__ == "__main__":

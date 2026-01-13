@@ -1,4 +1,4 @@
-# PCModel
+# pcm
 
 This is a framework for predictive coding network model.
 
