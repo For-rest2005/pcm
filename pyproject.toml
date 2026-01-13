@@ -18,5 +18,12 @@ dependencies = [
     "matplotlib",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "jupyter",
+    "jupyterlab",
+    "ipykernel",
+]
+
 [tool.setuptools.packages.find]
 where = ["src"]
